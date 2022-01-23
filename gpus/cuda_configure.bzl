@@ -21,7 +21,7 @@
     `/usr/local/cuda`.
   * `TF_CUDA_COMPUTE_CAPABILITIES`: The CUDA compute capabilities. Default is
     `3.5,5.2`.
-  * `PYTHON_BIN_PATH`: The python binary path
+  * `PYTHON3_BIN_PATH`: The python binary path
 """
 
 load(
@@ -43,7 +43,7 @@ load(
     "get_bash_bin",
     "get_cpu_value",
     "get_host_environ",
-    "get_python_bin",
+    "get_python3_bin",
     "is_windows",
     "raw_exec",
     "read_dir",
@@ -61,7 +61,7 @@ _TF_CUDNN_VERSION = "TF_CUDNN_VERSION"
 _CUDNN_INSTALL_PATH = "CUDNN_INSTALL_PATH"
 _TF_CUDA_COMPUTE_CAPABILITIES = "TF_CUDA_COMPUTE_CAPABILITIES"
 _TF_CUDA_CONFIG_REPO = "TF_CUDA_CONFIG_REPO"
-_PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
+_PYTHON3_BIN_PATH = "PYTHON3_BIN_PATH"
 
 def to_list_of_strings(elements):
     """Convert the list of ["a", "b", "c"] into '"a", "b", "c"'.
@@ -165,7 +165,7 @@ def _get_win_cuda_defines(repository_ctx):
         ),
     )
 
-    msvc_cl_path = get_python_bin(repository_ctx)
+    msvc_cl_path = get_python3_bin(repository_ctx)
     msvc_ml_path = find_msvc_tool(repository_ctx, vc_path, "ml64.exe").replace(
         "\\",
         "/",
@@ -480,7 +480,7 @@ def _check_cuda_lib_params(lib, cpu_value, basedir, version, static = False):
     )
 
 def _check_cuda_libs(repository_ctx, script_path, libs):
-    python_bin = get_python_bin(repository_ctx)
+    python3_bin = get_python3_bin(repository_ctx)
     contents = repository_ctx.read(script_path).splitlines()
 
     cmd = "from os import linesep;"
@@ -490,10 +490,10 @@ def _check_cuda_libs(repository_ctx, script_path, libs):
     cmd += "f.close();"
     cmd += "from os import system;"
     args = " ".join(["\"" + path + "\" " + str(check) for path, check in libs])
-    cmd += "system('%s script.py %s');" % (python_bin, args)
+    cmd += "system('%s script.py %s');" % (python3_bin, args)
 
     all_paths = [path for path, _ in libs]
-    checked_paths = execute(repository_ctx, [python_bin, "-c", cmd]).stdout.splitlines()
+    checked_paths = execute(repository_ctx, [python3_bin, "-c", cmd]).stdout.splitlines()
 
     # Filter out empty lines from splitting on '\r\n' on Windows
     checked_paths = [path for path in checked_paths if len(path) > 0]
@@ -601,7 +601,7 @@ def _cudart_static_linkopt(cpu_value):
     return "" if cpu_value == "Darwin" else "\"-lrt\","
 
 def _exec_find_cuda_config(repository_ctx, script_path, cuda_libraries):
-    python_bin = get_python_bin(repository_ctx)
+    python3_bin = get_python3_bin(repository_ctx)
 
     # If used with remote execution then repository_ctx.execute() can't
     # access files from the source tree. A trick is to read the contents
@@ -619,10 +619,10 @@ def _exec_find_cuda_config(repository_ctx, script_path, cuda_libraries):
         "f = open('script.py', 'wb');" +
         "f.write(script);" +
         "f.close();" +
-        "system('\"%s\" script.py %s');" % (python_bin, " ".join(cuda_libraries))
+        "system('\"%s\" script.py %s');" % (python3_bin, " ".join(cuda_libraries))
     )
 
-    return execute(repository_ctx, [python_bin, "-c", decompress_and_execute_cmd])
+    return execute(repository_ctx, [python3_bin, "-c", decompress_and_execute_cmd])
 
 # TODO(csigg): Only call once instead of from here, tensorrt_configure.bzl,
 # and nccl_configure.bzl.
@@ -1374,7 +1374,7 @@ _ENVIRONS = [
     _TF_CUDNN_VERSION,
     _TF_CUDA_COMPUTE_CAPABILITIES,
     "NVVMIR_LIBRARY_DIR",
-    _PYTHON_BIN_PATH,
+    _PYTHON3_BIN_PATH,
     "TMP",
     "TMPDIR",
     "TF_CUDA_PATHS",

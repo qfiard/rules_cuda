@@ -1,8 +1,7 @@
 """Functions common across configure rules."""
 
 BAZEL_SH = "BAZEL_SH"
-PYTHON_BIN_PATH = "PYTHON_BIN_PATH"
-PYTHON_LIB_PATH = "PYTHON_LIB_PATH"
+PYTHON3_BIN_PATH = "PYTHON3_BIN_PATH"
 TF_PYTHON_CONFIG_REPO = "TF_PYTHON_CONFIG_REPO"
 
 def auto_config_fail(msg):
@@ -29,27 +28,27 @@ def which(repository_ctx, program_name):
         result = execute(repository_ctx, ["which", program_name])
     return result.stdout.rstrip()
 
-def get_python_bin(repository_ctx):
-    """Gets the python bin path.
+def get_python3_bin(repository_ctx):
+    """Gets the python3 bin path.
 
     Args:
       repository_ctx: the repository_ctx
 
     Returns:
-      The python bin path.
+      The python3 bin path.
     """
-    python_bin = get_host_environ(repository_ctx, PYTHON_BIN_PATH)
-    if python_bin != None:
-        return python_bin
-    python_bin_path = which(repository_ctx, "python")
-    if python_bin_path == None:
-        auto_config_fail("Cannot find python in PATH, please make sure " +
-                         "python is installed and add its directory in PATH, or --define " +
+    python3_bin = get_host_environ(repository_ctx, PYTHON3_BIN_PATH)
+    if python3_bin != None:
+        return python3_bin
+    python3_bin_path = which(repository_ctx, "python3")
+    if python3_bin_path == None:
+        auto_config_fail("Cannot find python3 in PATH, please make sure " +
+                         "python3 is installed and add its directory in PATH, or --define " +
                          "%s='/something/else'.\nPATH=%s" % (
-                             PYTHON_BIN_PATH,
+                             PYTHON3_BIN_PATH,
                              get_environ("PATH", ""),
                          ))
-    return python_bin_path
+    return python3_bin_path
 
 def get_bash_bin(repository_ctx):
     """Gets the bash bin path.
